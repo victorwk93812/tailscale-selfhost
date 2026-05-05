@@ -1,0 +1,32 @@
+services:
+  anki_sync_server: # See this https://hub.docker.com/r/jeankhawand/anki-sync-server
+    image: jeankhawand/anki-sync-server:25.07
+    restart: always
+    environment:
+      - SYNC_USER1=jcmaxwell0812:jcmaxwell0812 # Optional if you are migrating an existing database with users already set up
+      - SYNC_USER2=test:test # Optional if you are migrating an existing database with users already set up
+    ports:
+      - "127.0.0.1:8080:8080" # Locked to localhost for Tailscale Serve
+    volumes:
+      - ./anki-data:/anki_data # Bind mount: puts data in a folder right next to this file
+
+  forgejo:
+    image: codeberg.org/forgejo/forgejo:15
+    container_name: forgejo
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+    volumes:
+      - ./forgejo-data:/data
+    ports:
+      - "127.0.0.1:3000:3000"
+    restart: always
+
+  silverbullet:
+    image: zefhemel/silverbullet:latest
+    container_name: silverbullet
+    volumes:
+      - ./silverbullet-data:/space
+    ports:
+      - "127.0.0.1:3001:3000"
+    restart: always
