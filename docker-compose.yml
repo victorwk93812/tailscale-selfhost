@@ -1,32 +1,243 @@
-services:
-  anki_sync_server: # See this https://hub.docker.com/r/jeankhawand/anki-sync-server
-    image: jeankhawand/anki-sync-server:25.07
-    restart: always
-    environment:
-      - SYNC_USER1=jcmaxwell0812:jcmaxwell0812 # Optional if you are migrating an existing database with users already set up
-      - SYNC_USER2=test:test # Optional if you are migrating an existing database with users already set up
-    ports:
-      - "127.0.0.1:8080:8080" # Locked to localhost for Tailscale Serve
-    volumes:
-      - ./anki-data:/anki_data # Bind mount: puts data in a folder right next to this file
+# Tailscale Sidecar + Dashboard zero-trust stack (Podman rootless)
+#
+# Every app rides its own tailscale/tailscale sidecar. Each sidecar joins the
+# Tailnet as its own node (own IP + MagicDNS name + HTTPS). The app container
+# shares the sidecar's network namespace via network_mode and exposes NO host
+# ports. Only `homepage` binds a host port (127.0.0.1:3000).
+#
+# TS_USERSPACE=true is required: rootless Podman has no /dev/net/tun.
 
-  forgejo:
-    image: codeberg.org/forgejo/forgejo:15
-    container_name: forgejo
+x-podman:
+  in_pod: false
+services:
+  # ---------------------------------------------------------------------------
+  # Silverbullet (Productivity)
+  # ---------------------------------------------------------------------------
+  tailscale-silverbullet:
+    image: tailscale/tailscale:latest
+    container_name: tailscale-silverbullet
+    hostname: silverbullet
     environment:
-      - USER_UID=1000
-      - USER_GID=1000
+      - TS_AUTHKEY=${TS_AUTHKEY_SILVERBULLET}
+      - TS_HOSTNAME=silverbullet
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=true
+      - TS_SERVE_CONFIG=/config/serve.json
     volumes:
-      - ./forgejo-data:/data
-    ports:
-      - "127.0.0.1:3000:3000"
+      - ./tailscale-silverbullet-state:/var/lib/tailscale
+      - ./tailscale-serve/silverbullet.json:/config/serve.json:ro
     restart: always
 
   silverbullet:
     image: zefhemel/silverbullet:latest
-    container_name: silverbullet
+    network_mode: "service:tailscale-silverbullet"
+    depends_on:
+      - tailscale-silverbullet
     volumes:
       - ./silverbullet-data:/space
+    restart: always
+
+  # ---------------------------------------------------------------------------
+  # Forgejo (Infrastructure)
+  # ---------------------------------------------------------------------------
+  tailscale-forgejo:
+    image: tailscale/tailscale:latest
+    container_name: tailscale-forgejo
+    hostname: forgejo
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY_FORGEJO}
+      - TS_HOSTNAME=forgejo
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=true
+      - TS_SERVE_CONFIG=/config/serve.json
+    volumes:
+      - ./tailscale-forgejo-state:/var/lib/tailscale
+      - ./tailscale-serve/forgejo.json:/config/serve.json:ro
+    restart: always
+
+  forgejo:
+    image: codeberg.org/forgejo/forgejo:15
+    network_mode: "service:tailscale-forgejo"
+    depends_on:
+      - tailscale-forgejo
+    # Run as root inside the container. Default rootless Podman maps container
+    # uid/gid 0 -> host jcmaxwell:users, so /data files land owned by you with
+    # no chown and no userns (which breaks devpts in the shared netns).
+    environment:
+      - USER_UID=1000
+      - USER_GID=983
+    volumes:
+      - ./forgejo-data:/data
+    restart: always
+
+  # ---------------------------------------------------------------------------
+  # Anki Sync Server (Productivity)
+  # ---------------------------------------------------------------------------
+  tailscale-anki:
+    image: tailscale/tailscale:latest
+    container_name: tailscale-anki
+    hostname: anki
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY_ANKI}
+      - TS_HOSTNAME=anki
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=true
+      - TS_SERVE_CONFIG=/config/serve.json
+    volumes:
+      - ./tailscale-anki-state:/var/lib/tailscale
+      - ./tailscale-serve/anki.json:/config/serve.json:ro
+    restart: always
+
+  anki_sync_server: # See https://hub.docker.com/r/jeankhawand/anki-sync-server
+    image: jeankhawand/anki-sync-server:25.07
+    network_mode: "service:tailscale-anki"
+    depends_on:
+      - tailscale-anki
+    user: "0:0" # root in-container -> host jcmaxwell:users via default rootless map
+    environment:
+      - SYNC_USER1=jcmaxwell0812:jcmaxwell0812 # Optional if migrating an existing DB with users set up
+      - SYNC_USER2=test:test # Optional if migrating an existing DB with users set up
+    volumes:
+      - ./anki-data:/anki_data # Bind mount: data folder next to this file
+    restart: always
+
+  # ---------------------------------------------------------------------------
+  # Vaultwarden (Infrastructure)
+  # ---------------------------------------------------------------------------
+  tailscale-vaultwarden:
+    image: tailscale/tailscale:latest
+    container_name: tailscale-vaultwarden
+    hostname: vaultwarden
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY_VAULTWARDEN}
+      - TS_HOSTNAME=vaultwarden
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=true
+      - TS_SERVE_CONFIG=/config/serve.json
+    volumes:
+      - ./tailscale-vaultwarden-state:/var/lib/tailscale
+      - ./tailscale-serve/vaultwarden.json:/config/serve.json:ro
+    restart: always
+
+  vaultwarden:
+    image: vaultwarden/server:latest
+    network_mode: "service:tailscale-vaultwarden"
+    depends_on:
+      - tailscale-vaultwarden
+    volumes:
+      - ./vaultwarden-data:/data
+    restart: always
+
+  # ---------------------------------------------------------------------------
+  # Stirling PDF (Productivity)
+  # ---------------------------------------------------------------------------
+  tailscale-stirling:
+    image: tailscale/tailscale:latest
+    container_name: tailscale-stirling
+    hostname: stirling
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY_STIRLING}
+      - TS_HOSTNAME=stirling
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=true
+      - TS_SERVE_CONFIG=/config/serve.json
+    volumes:
+      - ./tailscale-stirling-state:/var/lib/tailscale
+      - ./tailscale-serve/stirling.json:/config/serve.json:ro
+    restart: always
+
+  stirling-pdf:
+    image: docker.io/stirlingtools/stirling-pdf:latest
+    network_mode: "service:tailscale-stirling"
+    depends_on:
+      - tailscale-stirling
+    environment:
+      - DISABLE_ADDITIONAL_FEATURES=false
+    volumes:
+      - ./stirling-data/configs:/configs
+      - ./stirling-data/tessdata:/usr/share/tessdata
+    restart: always
+
+  # ---------------------------------------------------------------------------
+  # Actual Budget (Productivity)
+  # ---------------------------------------------------------------------------
+  tailscale-budget:
+    image: tailscale/tailscale:latest
+    container_name: tailscale-budget
+    hostname: budget
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY_BUDGET}
+      - TS_HOSTNAME=budget
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=true
+      - TS_SERVE_CONFIG=/config/serve.json
+    volumes:
+      - ./tailscale-budget-state:/var/lib/tailscale
+      - ./tailscale-serve/budget.json:/config/serve.json:ro
+    restart: always
+
+  budget:
+    image: ghcr.io/actualbudget/actual-server:latest
+    network_mode: "service:tailscale-budget"
+    depends_on:
+      - tailscale-budget
+    user: "0:0" # root in-container -> host jcmaxwell:users via default rootless map
+    volumes:
+      - ./budget-data:/data
+    restart: always
+
+  # ---------------------------------------------------------------------------
+  # Syncthing (Infrastructure)
+  # ---------------------------------------------------------------------------
+  tailscale-syncthing:
+    image: tailscale/tailscale:latest
+    container_name: tailscale-syncthing
+    hostname: syncthing
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY_SYNCTHING}
+      - TS_HOSTNAME=syncthing
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=true
+      - TS_SERVE_CONFIG=/config/serve.json
+    volumes:
+      - ./tailscale-syncthing-state:/var/lib/tailscale
+      - ./tailscale-serve/syncthing.json:/config/serve.json:ro
+    restart: always
+
+  syncthing:
+    image: docker.io/syncthing/syncthing:latest
+    network_mode: "service:tailscale-syncthing"
+    depends_on:
+      - tailscale-syncthing
+    user: "0:0" # root in-container -> host jcmaxwell:users via default rootless map
+    environment:
+      # Bind GUI to 0.0.0.0 (not localhost): Syncthing's anti-DNS-rebinding
+      # "Host check" ONLY applies when bound to loopback, so a non-loopback
+      # bind avoids the "Host check error" behind tailscale serve. serve still
+      # reaches it via 127.0.0.1:8384 (0.0.0.0 covers loopback). The sidecar
+      # netns has no host port, so this stays Tailnet-only — set a GUI
+      # password in Syncthing settings since it now also answers on the
+      # tailnet iface directly.
+      - STGUIADDRESS=0.0.0.0:8384
+    volumes:
+      - ./syncthing-data:/var/syncthing
+    restart: always
+
+  # ---------------------------------------------------------------------------
+  # Homepage dashboard — ONLY container allowed a host port
+  # ---------------------------------------------------------------------------
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    environment:
+      - HOMEPAGE_ALLOWED_HOSTS=${MAIN_HOST_TS_DN}
+      # Replace with your actual Tailnet domain
+      # OR just use a wildcard since Tailscale is already your security layer:
+      # - HOMEPAGE_ALLOWED_HOSTS=*
+    container_name: homepage
     ports:
-      - "127.0.0.1:3001:3000"
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - ./homepage:/app/config
+      - ./homepage/images:/app/public/images
+      - ./homepage/icons:/app/public/icons
     restart: always

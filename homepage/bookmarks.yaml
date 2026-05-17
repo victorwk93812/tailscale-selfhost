@@ -1,0 +1,84 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/bookmarks
+
+# More bookmarks and need to find the exact icon name:
+# For Brands: Search simpleicons.org. If you find an icon named "Tailscale", you just write icon: si-tailscale.
+# For Generic Shapes: Search pictogrammers.com/library/mdi/. If you find a shape named "server-network", you write icon: mdi-server-network.
+# dashboard icons: https://dashboardicons.com or https://github.com/homarr-labs/dashboard-icons/tree/main
+# simple icons (si-): https://simpleicons.org/
+# material design icons (mdi-): https://pictogrammers.com/library/mdi/
+
+- Developer:
+    - Github:
+      - icon: github.png
+      # - icon: si-github # Use this for an emoji-like icon
+      # abbr: GH
+        href: https://github.com/
+    - crates.io:
+      - icon: rust.png
+        href: https://crates.io/
+- AI Tools:
+    - Gemini:
+      - icon: google-gemini.png
+        href: https://gemini.google.com/
+    - Claude:
+      - icon: claude-ai.png
+        href: https://claude.ai/
+
+- Entertainment:
+    - YouTube:
+      - icon: youtube.png
+        href: https://youtube.com/
+    - YouTube Music:
+      - icon: youtube-music.png
+        href: https://music.youtube.com/
+    - Gamer Anime:
+      - icon: /icons/gamer_anime_icon.png
+        href: https://ani.gamer.com.tw/
+    - Syosetu:
+      - icon: /icons/narou_icon.jpg
+        href: https://syosetu.com/
+
+- Google:
+    - Google:
+      - icon: google.png
+        href: https://google.com/
+    - Gmail:
+      - icon: gmail.png
+        href: https://mail.google.com/
+    - Drive:
+      - icon: google-drive.png
+        href: https://drive.google.com/
+    - Map:
+      - icon: google-maps.png
+        href: https://maps.google.com/
+
+- Misc:
+    - NTU COOL:
+      - icon: /icons/ntu_cool_icon.png
+        href: https://cool.ntu.edu.tw/
+    - NTU Webmail:
+      - icon: /icons/ntu_icon.jpg
+        href: https://wmail1.cc.ntu.edu.tw/rc/?_task=mail&_mbox=INBOX
+
+- Social:
+    - Reddit:
+      - icon: reddit.png
+        href: https://reddit.com/
+    - Slack:
+      - icon: slack.png
+        href: https://app.slack.com/
+    - Facebook:
+      - icon: facebook.png
+        href: https://facebook.com/
+    - X:
+      - icon: x.png
+        href: https://x.com/
+    - Discord:
+      - icon: discord.png
+        href: https://discord.com/app
+    - Instagram:
+      - icon: instagram.png
+        href: https://instagram.com/
+

@@ -1,0 +1,28 @@
+---
+# settings.yaml
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/settings/
+
+# Set a dark theme foundation
+theme: dark
+color: slate
+
+# Pull a dynamic, high-res background from Unsplash
+background:
+  image: /images/dawn-wallpaper.jpg
+  # image: https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=2560&q=80
+  # Optional: If you want the background image itself to be slightly blurred
+  # blur: sm 
+  # Optional: Darken the background so your white text pops
+  # brightness: 75
+providers:
+  openweathermap: openweathermapapikey
+  weatherapi: weatherapiapikey
+
+layout:
+  Productivity:
+    style: row
+    columns: 3 # SilverBullet, Anki, Stirling PDF
+  Infrastructure:
+    style: row
+    columns: 2 # Forgejo, Vaultwarden

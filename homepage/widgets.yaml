@@ -1,0 +1,21 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/info-widgets/
+
+- resources:
+    cpu: true
+    memory: true
+    disk: /
+
+- search:
+    provider: google
+    target: _blank
+
+- openmeteo:
+    label: Taipei
+    # Da'an District / Taipei coordinates
+    latitude: 25.0330
+    longitude: 121.5654
+    timezone: Asia/Taipei
+    units: metric # Change to imperial if you prefer Fahrenheit
+    cache: 15 # Updates every 15 minutes

@@ -1,0 +1,29 @@
+/* ~/selfhost/homepage/custom.css */
+
+/* Target the service cards and widget blocks */
+div[class*="bg-white/"], 
+div[class*="dark:bg-gray-"],
+div[class*="dark:bg-slate-"],
+div[class*="bg-black/"] {
+    /* Make the background translucent */
+    background-color: rgba(20, 20, 20, 0.4) !important;
+    
+    /* Apply the glass blur effect */
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    
+    /* Add a subtle glowing border for depth */
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    
+    /* Smooth out the shadows */
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Optional: Make hovering over a service card slightly brighten the glass */
+a:hover div[class*="bg-white/"], 
+a:hover div[class*="dark:bg-gray-"],
+a:hover div[class*="dark:bg-slate-"] {
+    background-color: rgba(40, 40, 40, 0.5) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    transition: all 0.3s ease;
+}

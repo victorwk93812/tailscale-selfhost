@@ -1,0 +1,53 @@
+# More bookmarks and need to find the exact icon name:
+# For Brands: Search simpleicons.org. If you find an icon named "Tailscale", you just write icon: si-tailscale.
+# For Generic Shapes: Search pictogrammers.com/library/mdi/. If you find a shape named "server-network", you write icon: mdi-server-network.
+
+# For showStats to work, the podman socket must be activated and mounted into the container. 
+# Further config is also needed. 
+
+- Productivity:
+    - Silverbullet:
+        icon: mdi-notebook-edit
+        href: https://silverbullet.ussuri-macaroni.ts.net
+        description: Personal knowledge base & notes
+        siteMonitor: https://silverbullet.ussuri-macaroni.ts.net
+        # showStats: true
+    # We don't directly access the anki sync server
+    - Anki Sync:
+        icon: si-anki
+        href: https://anki.ussuri-macaroni.ts.net
+        description: Anki collection sync server
+        siteMonitor: https://anki.ussuri-macaroni.ts.net
+        # showStats: true
+    - Stirling PDF:
+        icon: mdi-file-pdf-box
+        href: https://stirling.ussuri-macaroni.ts.net
+        description: PDF toolbox — merge, split, OCR, convert
+        siteMonitor: https://stirling.ussuri-macaroni.ts.net
+        # showStats: true
+    - Actual Budget:
+        icon: si-actualbudget
+        href: https://budget.ussuri-macaroni.ts.net
+        description: Personal finance & budgeting
+        siteMonitor: https://budget.ussuri-macaroni.ts.net
+        # showStats: true
+
+- Infrastructure:
+    - Forgejo:
+        icon: si-forgejo
+        href: https://forgejo.ussuri-macaroni.ts.net
+        description: Self-hosted Git forge
+        siteMonitor: https://forgejo.ussuri-macaroni.ts.net
+        # showStats: true
+    - Vaultwarden:
+        icon: si-bitwarden
+        href: https://vaultwarden.ussuri-macaroni.ts.net
+        description: Password & secrets vault
+        siteMonitor: https://vaultwarden.ussuri-macaroni.ts.net
+        # showStats: true
+    - Syncthing:
+        icon: si-syncthing
+        href: https://syncthing.ussuri-macaroni.ts.net
+        description: Continuous file synchronization
+        siteMonitor: https://syncthing.ussuri-macaroni.ts.net
+        # showStats: true
