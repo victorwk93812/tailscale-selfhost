@@ -95,8 +95,7 @@ services:
       - tailscale-anki
     user: "0:0" # root in-container -> host jcmaxwell:users via default rootless map
     environment:
-      - SYNC_USER1=jcmaxwell0812:jcmaxwell0812 # Optional if migrating an existing DB with users set up
-      - SYNC_USER2=test:test # Optional if migrating an existing DB with users set up
+      - SYNC_USER1=${ANKI_SYNC_USER1}
     volumes:
       - ./anki-data:/anki_data # Bind mount: data folder next to this file
     restart: always
