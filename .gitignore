@@ -2,3 +2,4 @@
 !.env.example
 silverbullet-data/
 !silverbullet-data/.gitkeep
+CLAUDE.local.md
