@@ -37,9 +37,9 @@ services:
       - ./silverbullet-data:/space
     restart: always
 
-  # ---------------------------------------------------------------------------
-  # Forgejo (Infrastructure)
-  # ---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
+    # Forgejo (Infrastructure)
+    # ---------------------------------------------------------------------------
   tailscale-forgejo:
     image: tailscale/tailscale:latest
     container_name: tailscale-forgejo
@@ -60,9 +60,9 @@ services:
     network_mode: "service:tailscale-forgejo"
     depends_on:
       - tailscale-forgejo
-    # Run as root inside the container. Default rootless Podman maps container
-    # uid/gid 0 -> host jcmaxwell:users, so /data files land owned by you with
-    # no chown and no userns (which breaks devpts in the shared netns).
+      # Run as root inside the container. Default rootless Podman maps container
+      # uid/gid 0 -> host jcmaxwell:users, so /data files land owned by you with
+      # no chown and no userns (which breaks devpts in the shared netns).
     environment:
       - USER_UID=1000
       - USER_GID=983
@@ -70,9 +70,9 @@ services:
       - ./forgejo-data:/data
     restart: always
 
-  # ---------------------------------------------------------------------------
-  # Anki Sync Server (Productivity)
-  # ---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
+    # Anki Sync Server (Productivity)
+    # ---------------------------------------------------------------------------
   tailscale-anki:
     image: tailscale/tailscale:latest
     container_name: tailscale-anki
@@ -101,9 +101,9 @@ services:
       - ./anki-data:/anki_data # Bind mount: data folder next to this file
     restart: always
 
-  # ---------------------------------------------------------------------------
-  # Vaultwarden (Infrastructure)
-  # ---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
+    # Vaultwarden (Infrastructure)
+    # ---------------------------------------------------------------------------
   tailscale-vaultwarden:
     image: tailscale/tailscale:latest
     container_name: tailscale-vaultwarden
@@ -128,9 +128,9 @@ services:
       - ./vaultwarden-data:/data
     restart: always
 
-  # ---------------------------------------------------------------------------
-  # Stirling PDF (Productivity)
-  # ---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
+    # Stirling PDF (Productivity)
+    # ---------------------------------------------------------------------------
   tailscale-stirling:
     image: tailscale/tailscale:latest
     container_name: tailscale-stirling
@@ -158,9 +158,9 @@ services:
       - ./stirling-data/tessdata:/usr/share/tessdata
     restart: always
 
-  # ---------------------------------------------------------------------------
-  # Actual Budget (Productivity)
-  # ---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
+    # Actual Budget (Productivity)
+    # ---------------------------------------------------------------------------
   tailscale-budget:
     image: tailscale/tailscale:latest
     container_name: tailscale-budget
@@ -186,9 +186,9 @@ services:
       - ./budget-data:/data
     restart: always
 
-  # ---------------------------------------------------------------------------
-  # Syncthing (Infrastructure)
-  # ---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
+    # Syncthing (Infrastructure)
+    # ---------------------------------------------------------------------------
   tailscale-syncthing:
     image: tailscale/tailscale:latest
     container_name: tailscale-syncthing
@@ -219,13 +219,19 @@ services:
       # password in Syncthing settings since it now also answers on the
       # tailnet iface directly.
       - STGUIADDRESS=0.0.0.0:8384
+      # The entrypoint drops to PUID:PGID (default 1000:1000 = host 100999)
+      # even under user 0:0. Keep Syncthing itself root so files land as
+      # host jcmaxwell.
+      - PUID=0
+      - PGID=0
     volumes:
       - ./syncthing-data:/var/syncthing
+      - ${SYNC_FILES_DIR:-./files}:/var/syncthing/files
     restart: always
 
-  # ---------------------------------------------------------------------------
-  # Homepage dashboard — ONLY container allowed a host port
-  # ---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
+    # Homepage dashboard — ONLY container allowed a host port
+    # ---------------------------------------------------------------------------
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     environment:

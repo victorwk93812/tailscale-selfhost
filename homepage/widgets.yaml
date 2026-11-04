@@ -9,7 +9,7 @@
 
 - search:
     provider: google
-    target: _blank
+    target: _self
 
 - openmeteo:
     label: Taipei

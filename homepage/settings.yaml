@@ -7,6 +7,9 @@
 theme: dark
 color: slate
 
+# Open link on current tab, new tab (_blank) by default
+target: _self
+
 # Pull a dynamic, high-res background from Unsplash
 background:
   image: /images/dawn-wallpaper.jpg
